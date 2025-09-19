@@ -1,9 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import './App.css';
 import ProductList from './components/ProductList';
 import Cart from './components/Cart';
 import Header from './components/Header';
+import { useData, useFeatureFlag, useInitialize, useVisitorCode } from '@kameleoon/react-sdk';
+
+/* global Kameleoon */
+
+
 
 const API_BASE_URL = 'http://localhost:5001/api';
 
@@ -14,11 +19,30 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const userId = 'user123'; // Simple user ID for demo
+  const [isActive, setIsActive] = useState(false);
+
+  const { initialize } = useInitialize();
+  const { getVisitorCode } = useVisitorCode();
+  const { isFeatureFlagActive } = useFeatureFlag();
+  const { trackConversion } = useData();
+  const init = useCallback(async () => {
+    await initialize();
+    const visitorCode = getVisitorCode();
+    setIsActive(isFeatureFlagActive({visitorCode, featureKey: 'shopping_test'}));
+
+    // trackConversion({
+    //   visitorCode,
+    //   goalId: 391793,
+    // });
+    console.log('Visitor Code:', visitorCode);
+    console.log('Feature Variation:', isActive);
+  }, [initialize, getVisitorCode, isFeatureFlagActive, trackConversion]);
 
   useEffect(() => {
+    init();
     fetchProducts();
     fetchCart();
-  }, []);
+  }, [init]);
 
   const fetchProducts = async () => {
     try {
@@ -72,12 +96,35 @@ function App() {
     }
   };
 
+  const handleCheckout = async () => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/checkout/${userId}`);
+      console.log('Checkout successful:', response.data);
+      
+      // Update local cart state to reflect empty cart
+      setCart([]);
+      
+      // Show success message or redirect
+      alert(`Checkout successful! Order ID: ${response.data.order.orderId}`);
+      
+      // Close cart after successful checkout
+      setShowCart(false);
+
+      // confirm kameleoon goal
+      Kameleoon.API.Goals.processConversion(391785);
+      
+    } catch (error) {
+      console.error('Error during checkout:', error);
+      alert('Checkout failed. Please try again.');
+    }
+  };
+
   const searchProducts = async (query) => {
     if (!query.trim()) {
       fetchProducts();
       return;
     }
-    
+
     try {
       const response = await axios.get(`${API_BASE_URL}/products/search/${query}`);
       setProducts(response.data);
@@ -101,24 +148,26 @@ function App() {
 
   return (
     <div className="App">
-      <Header 
+      <Header
         cartItemCount={getCartItemCount()}
         onCartClick={() => setShowCart(!showCart)}
         onSearch={handleSearch}
         searchQuery={searchQuery}
       />
-      
+
       <main className="main-content">
         {showCart ? (
-          <Cart 
-            cart={cart}
+          <Cart
+            cart={cart} 
             products={products}
             onRemove={removeFromCart}
             onUpdateQuantity={updateCartQuantity}
             onClose={() => setShowCart(false)}
+            onCheckout={handleCheckout}
+            isKameleoonActive={isActive}
           />
         ) : (
-          <ProductList 
+          <ProductList
             products={products}
             onAddToCart={addToCart}
           />

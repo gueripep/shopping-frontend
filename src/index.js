@@ -3,11 +3,23 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { createClient, Environment, KameleoonProvider } from '@kameleoon/react-sdk';
+
+// Kameleoon configuration
+const configuration = {
+  updateInterval: 60,
+  environment: Environment.Production,
+};
+const kameleoonClient = createClient({ siteCode: '17lbovqbd1', configuration });
+
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <KameleoonProvider client={kameleoonClient}>
+      <App />
+    </KameleoonProvider>
   </React.StrictMode>
 );
 

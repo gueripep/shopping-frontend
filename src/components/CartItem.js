@@ -1,7 +1,9 @@
 import React from 'react';
 import './CartItem.css';
 
-const CartItem = ({ item, onRemove, onUpdateQuantity }) => {
+
+
+const CartItem = ({ item, onRemove, onUpdateQuantity, isKameleoonActive }) => {
   const { product, quantity, productId } = item;
 
   const handleQuantityChange = (newQuantity) => {
@@ -17,40 +19,40 @@ const CartItem = ({ item, onRemove, onUpdateQuantity }) => {
   };
 
   return (
-    <div className="cart-item">
-      <img 
-        src={product.image} 
-        alt={product.name} 
+    <div className={`cart-item ${isKameleoonActive ? 'cart-item-variation' : ''}`}>
+      <img
+        src={product.image}
+        alt={product.name}
         className="cart-item-image"
       />
-      
+
       <div className="cart-item-details">
         <h4 className="cart-item-name">{product.name}</h4>
         <p className="cart-item-price">${product.price}</p>
       </div>
-      
+
       <div className="cart-item-controls">
         <div className="quantity-controls">
-          <button 
+          <button
             className="quantity-btn"
             onClick={() => handleQuantityChange(quantity - 1)}
           >
             -
           </button>
           <span className="quantity">{quantity}</span>
-          <button 
+          <button
             className="quantity-btn"
             onClick={() => handleQuantityChange(quantity + 1)}
           >
             +
           </button>
         </div>
-        
+
         <div className="cart-item-total">
           ${(product.price * quantity).toFixed(2)}
         </div>
-        
-        <button 
+
+        <button
           className="remove-btn"
           onClick={handleRemove}
         >

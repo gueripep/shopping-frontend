@@ -2,7 +2,7 @@ import React from 'react';
 import CartItem from './CartItem';
 import './Cart.css';
 
-const Cart = ({ cart, products, onRemove, onUpdateQuantity, onClose }) => {
+const Cart = ({ cart, products, isKameleoonActive, onRemove, onUpdateQuantity, onClose, onCheckout }) => {
   const getCartItemsWithDetails = () => {
     return cart.map(cartItem => {
       const product = products.find(p => p.id === cartItem.productId);
@@ -50,6 +50,7 @@ const Cart = ({ cart, products, onRemove, onUpdateQuantity, onClose }) => {
                 item={item}
                 onRemove={onRemove}
                 onUpdateQuantity={onUpdateQuantity}
+                isKameleoonActive={isKameleoonActive}
               />
             ))}
           </div>
@@ -64,7 +65,7 @@ const Cart = ({ cart, products, onRemove, onUpdateQuantity, onClose }) => {
               <button className="continue-shopping-btn" onClick={onClose}>
                 Continue Shopping
               </button>
-              <button className="checkout-btn">
+              <button className="checkout-btn" onClick={onCheckout} id='kameleoon-checkout-btn'>
                 Checkout
               </button>
             </div>
