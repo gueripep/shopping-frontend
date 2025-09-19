@@ -7,10 +7,10 @@ import { createClient, Environment, KameleoonProvider } from '@kameleoon/react-s
 
 // Kameleoon configuration
 const configuration = {
-  updateInterval: 60,
+  updateInterval: 1,
   environment: Environment.Production,
 };
-const kameleoonClient = createClient({ siteCode: '17lbovqbd1', configuration });
+const kameleoonClient = createClient({ siteCode: 'dnkd8eslzh', configuration });
 
 
 
