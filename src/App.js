@@ -10,7 +10,7 @@ import { useData, useFeatureFlag, useInitialize, useVisitorCode } from '@kameleo
 
 
 
-const API_BASE_URL = 'http://localhost:5001/api';
+const API_BASE_URL = 'https://api.gueripep.com';
 
 function App() {
   const [products, setProducts] = useState([]);
