@@ -49,14 +49,14 @@
   <meta name="theme-color" content="#000000" />
   <meta name="description" content="Web site created using create-react-app" />
   
-  <!-- Content Security Policy for Kameleoon -->
+  <!-- Content Security Policy for Kameleoon and other third-party services -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self' https://*.kameleoon.com https://*.kameleoon.io https://*.kameleoon.eu https://*.kameleoon.net;
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://17lbovqbd1.kameleoon.io https://dnkd8eslzh.kameleoon.io https://static.kameleoon.com https://graphical-editor.kameleoon.com https://simulation.kameleoon.com https://client-config.kameleoon.com https://sdk-config.kameleoon.eu https://electra.kameleoon.com https://aibuilder.kameleoon.com https://www.googletagmanager.com;
-    style-src 'self' 'unsafe-inline' https://static.kameleoon.com https://static.products.kameleoon.com https://graphical-editor.kameleoon.com https://simulation.kameleoon.com https://electra.kameleoon.com https://aibuilder.kameleoon.com;
-    connect-src 'self' https://17lbovqbd1.kameleoon.io https://dnkd8eslzh.kameleoon.io https://static.kameleoon.com https://data.kameleoon.io https://data.kameleoon.eu https://eu-data.kameleoon.io https://eu-data.kameleoon.eu https://na-data.kameleoon.io https://na-data.kameleoon.eu https://editor.kameleoon.com https://graphical-editor.kameleoon.com https://simulation.kameleoon.com https://api.kameleoon.com https://customers.kameleoon.com https://logger.kameleoon.io https://client-config.kameleoon.com https://sdk-config.kameleoon.eu https://api.products.kameleoon.com https://www.google-analytics.com https://www.googletagmanager.com;
-    img-src 'self' data: https://17lbovqbd1.kameleoon.io https://dnkd8eslzh.kameleoon.io https://storage.kameleoon.eu https://storage.kameleoon.io https://graphical-editor.kameleoon.com https://simulation.kameleoon.com https://static.kameleoon.com https://images.products.kameleoon.com https://picsum.photos;
-    frame-src 'self' https://graphical-editor.kameleoon.com https://www.googletagmanager.com;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.kameleoon.io https://*.kameleoon.com https://*.kameleoon.eu https://*.kameleoon.net https://www.googletagmanager.com https://www.google-analytics.com https://static.axept.io;
+    style-src 'self' 'unsafe-inline' https://*.kameleoon.com https://*.kameleoon.io https://*.kameleoon.eu https://*.kameleoon.net;
+    connect-src 'self' http://localhost:5001 https://*.kameleoon.io https://*.kameleoon.com https://*.kameleoon.eu https://*.kameleoon.net https://*.google-analytics.com https://www.googletagmanager.com https://region1.google-analytics.com;
+    img-src 'self' data: https://*.kameleoon.io https://*.kameleoon.com https://*.kameleoon.eu https://*.kameleoon.net https://picsum.photos;
+    frame-src 'self' https://*.kameleoon.com https://www.googletagmanager.com;
   " />
   <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
   <!--
