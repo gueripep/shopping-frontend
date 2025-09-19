@@ -19,7 +19,6 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const userId = 'user123'; // Simple user ID for demo
-  const [isActive, setIsActive] = useState(false);
 
   const { initialize } = useInitialize();
   const { getVisitorCode } = useVisitorCode();
@@ -28,12 +27,12 @@ function App() {
   const init = useCallback(async () => {
     await initialize();
     const visitorCode = getVisitorCode();
-    setIsActive(isFeatureFlagActive({visitorCode, featureKey: 'shopping_test'}));
+    const isActive = isFeatureFlagActive({visitorCode, featureKey: 'shopping_test'});
 
-    // trackConversion({
-    //   visitorCode,
-    //   goalId: 391793,
-    // });
+    trackConversion({
+      visitorCode,
+      goalId: 391793,
+    });
     console.log('Visitor Code:', visitorCode);
     console.log('Feature Variation:', isActive);
   }, [initialize, getVisitorCode, isFeatureFlagActive, trackConversion]);
@@ -158,13 +157,12 @@ function App() {
       <main className="main-content">
         {showCart ? (
           <Cart
-            cart={cart} 
+            cart={cart}
             products={products}
             onRemove={removeFromCart}
             onUpdateQuantity={updateCartQuantity}
             onClose={() => setShowCart(false)}
             onCheckout={handleCheckout}
-            isKameleoonActive={isActive}
           />
         ) : (
           <ProductList
