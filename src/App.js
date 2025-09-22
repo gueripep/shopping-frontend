@@ -99,7 +99,9 @@ function App() {
 
   const handleCheckout = async () => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/checkout/${userId}`);
+      const response = await axios.post(`${API_BASE_URL}/checkout/${userId}`, {
+        visitorCode: visitorCode  // Send the frontend visitor code to backend
+      });
       console.log('Checkout successful:', response.data);
 
       // confirm kameleoon goal
