@@ -1,14 +1,14 @@
 import React from 'react';
 import './Header.css';
 
-const Header = ({ cartItemCount, onCartClick, onSearch, searchQuery }) => {
+const Header = ({ cartItemCount, onCartClick, onSearch, searchQuery, isKameleoonActive }) => {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     onSearch(searchQuery);
   };
 
   return (
-    <header className="header">
+    <header className={`header ${isKameleoonActive ? 'kameleoon-active-header' : ''}`}>
       <div className="header-content">
         <h1 className="logo">🛒 ShopEasy</h1>
         

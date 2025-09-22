@@ -17,6 +17,7 @@ function App() {
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isActive, setIsActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const userId = 'user123'; // Simple user ID for demo
 
@@ -24,10 +25,12 @@ function App() {
   const { getVisitorCode } = useVisitorCode();
   const { isFeatureFlagActive } = useFeatureFlag();
   const { trackConversion } = useData();
+
+
   const init = useCallback(async () => {
     await initialize();
     const visitorCode = getVisitorCode();
-    const isActive = isFeatureFlagActive({visitorCode, featureKey: 'shopping_test'});
+    setIsActive(isFeatureFlagActive({visitorCode, featureKey: 'shopping_test'}));
 
     trackConversion({
       visitorCode,
