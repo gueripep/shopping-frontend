@@ -18,8 +18,10 @@ function App() {
   const [showCart, setShowCart] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isActive, setIsActive] = useState(false);
+  const [visitorCode, setVisitorCode] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const userId = 'user123'; // Simple user ID for demo
+  const featureKey = 'shopping_test';
 
   const { initialize } = useInitialize();
   const { getVisitorCode } = useVisitorCode();
@@ -30,12 +32,11 @@ function App() {
   const init = useCallback(async () => {
     await initialize();
     const visitorCode = getVisitorCode();
-
-    const featureKey = 'shopping_test';
-    const isFFActive = isFeatureFlagActive({visitorCode, featureKey});
-    setIsActive(isFFActive);
+    setVisitorCode(visitorCode);
+    const isActive = isFeatureFlagActive({ visitorCode, featureKey });
+    setIsActive(isActive);
     console.log('Visitor Code:', visitorCode);
-    console.log('Feature Variation:', isFFActive); // Log the actual value, not the stale state
+    console.log('Feature Variation:', isActive); // Log the actual value, not the stale state
   }, [initialize, getVisitorCode, isFeatureFlagActive, trackConversion]);
 
   useEffect(() => {
@@ -100,19 +101,25 @@ function App() {
     try {
       const response = await axios.post(`${API_BASE_URL}/checkout/${userId}`);
       console.log('Checkout successful:', response.data);
-      
+
+      // confirm kameleoon goal
+      trackConversion({
+        visitorCode,
+        goalId: 392014, // The ID for your "purchase" goal
+        revenue: response.data.order.total// Optional: include the revenue from the conversion
+      });
+
       // Update local cart state to reflect empty cart
       setCart([]);
-      
+
       // Show success message or redirect
       alert(`Checkout successful! Order ID: ${response.data.order.orderId}`);
-      
+
       // Close cart after successful checkout
       setShowCart(false);
 
-      // confirm kameleoon goal
-      Kameleoon.API.Goals.processConversion(391785);
-      
+
+
     } catch (error) {
       console.error('Error during checkout:', error);
       alert('Checkout failed. Please try again.');
