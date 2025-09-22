@@ -35,7 +35,7 @@ function App() {
     const isFFActive = isFeatureFlagActive({visitorCode, featureKey});
     setIsActive(isFFActive);
     console.log('Visitor Code:', visitorCode);
-    console.log('Feature Variation:', isActive);
+    console.log('Feature Variation:', isFFActive); // Log the actual value, not the stale state
   }, [initialize, getVisitorCode, isFeatureFlagActive, trackConversion]);
 
   useEffect(() => {
@@ -153,6 +153,7 @@ function App() {
         onCartClick={() => setShowCart(!showCart)}
         onSearch={handleSearch}
         searchQuery={searchQuery}
+        isKameleoonActive={isActive}
       />
 
       <main className="main-content">
