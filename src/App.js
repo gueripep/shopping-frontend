@@ -32,8 +32,8 @@ function App() {
     const visitorCode = getVisitorCode();
 
     const featureKey = 'shopping_test';
-    const isActive = isFeatureFlagActive({visitorCode, featureKey});
-    setIsActive(isActive);
+    const isFFActive = isFeatureFlagActive({visitorCode, featureKey});
+    setIsActive(isFFActive);
     console.log('Visitor Code:', visitorCode);
     console.log('Feature Variation:', isActive);
   }, [initialize, getVisitorCode, isFeatureFlagActive, trackConversion]);
