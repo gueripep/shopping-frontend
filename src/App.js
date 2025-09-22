@@ -30,12 +30,10 @@ function App() {
   const init = useCallback(async () => {
     await initialize();
     const visitorCode = getVisitorCode();
-    setIsActive(isFeatureFlagActive({visitorCode, featureKey: 'shopping_test'}));
 
-    trackConversion({
-      visitorCode,
-      goalId: 391793,
-    });
+    const featureKey = 'shopping_test';
+    const isActive = isFeatureFlagActive({visitorCode, featureKey});
+    setIsActive(isActive);
     console.log('Visitor Code:', visitorCode);
     console.log('Feature Variation:', isActive);
   }, [initialize, getVisitorCode, isFeatureFlagActive, trackConversion]);
