@@ -4,25 +4,28 @@ import './App.css';
 import ProductList from './components/ProductList';
 import Cart from './components/Cart';
 import Header from './components/Header';
+import Login from './components/Login';
+import Register from './components/Register';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { useData, useFeatureFlag, useInitialize, useVisitorCode } from '@kameleoon/react-sdk';
-
-/* global Kameleoon */
 
 
 
 const API_BASE_URL = 'https://api.gueripep.com';
 
-function App() {
+function AppContent() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isActive, setIsActive] = useState(false);
   const [visitorCode, setVisitorCode] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const userId = 'user123'; // Simple user ID for demo
   const featureKey = 'shopping_test';
 
+  const { currentUser } = useAuth();
   const { initialize } = useInitialize();
   const { getVisitorCode } = useVisitorCode();
   const { isFeatureFlagActive } = useFeatureFlag();
@@ -37,13 +40,26 @@ function App() {
     setIsActive(isActive);
     console.log('Visitor Code:', visitorCode);
     console.log('Feature Variation:', isActive); // Log the actual value, not the stale state
-  }, [initialize, getVisitorCode, isFeatureFlagActive, trackConversion]);
+  }, [initialize, getVisitorCode, isFeatureFlagActive, featureKey]);
+
+  const fetchCart = useCallback(async () => {
+    if (!currentUser) return;
+    
+    try {
+      const response = await axios.get(`${API_BASE_URL}/cart/${currentUser.uid}`);
+      setCart(response.data);
+    } catch (error) {
+      console.error('Error fetching cart:', error);
+    }
+  }, [currentUser]);
 
   useEffect(() => {
     init();
     fetchProducts();
-    fetchCart();
-  }, [init]);
+    if (currentUser) {
+      fetchCart();
+    }
+  }, [init, currentUser, fetchCart]);
 
   const fetchProducts = async () => {
     try {
@@ -56,18 +72,14 @@ function App() {
     }
   };
 
-  const fetchCart = async () => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/cart/${userId}`);
-      setCart(response.data);
-    } catch (error) {
-      console.error('Error fetching cart:', error);
-    }
-  };
-
   const addToCart = async (productId) => {
+    if (!currentUser) {
+      setShowLogin(true);
+      return;
+    }
+    
     try {
-      const response = await axios.post(`${API_BASE_URL}/cart/${userId}`, {
+      const response = await axios.post(`${API_BASE_URL}/cart/${currentUser.uid}`, {
         productId,
         quantity: 1
       });
@@ -78,8 +90,10 @@ function App() {
   };
 
   const removeFromCart = async (productId) => {
+    if (!currentUser) return;
+    
     try {
-      const response = await axios.delete(`${API_BASE_URL}/cart/${userId}/${productId}`);
+      const response = await axios.delete(`${API_BASE_URL}/cart/${currentUser.uid}/${productId}`);
       setCart(response.data);
     } catch (error) {
       console.error('Error removing from cart:', error);
@@ -87,8 +101,10 @@ function App() {
   };
 
   const updateCartQuantity = async (productId, quantity) => {
+    if (!currentUser) return;
+    
     try {
-      const response = await axios.put(`${API_BASE_URL}/cart/${userId}/${productId}`, {
+      const response = await axios.put(`${API_BASE_URL}/cart/${currentUser.uid}/${productId}`, {
         quantity
       });
       setCart(response.data);
@@ -98,8 +114,13 @@ function App() {
   };
 
   const handleCheckout = async () => {
+    if (!currentUser) {
+      setShowLogin(true);
+      return;
+    }
+    
     try {
-      const response = await axios.post(`${API_BASE_URL}/checkout/${userId}`, {
+      const response = await axios.post(`${API_BASE_URL}/checkout/${currentUser.uid}`, {
         visitorCode: visitorCode  // Send the frontend visitor code to backend
       });
       console.log('Checkout successful:', response.data);
@@ -119,8 +140,6 @@ function App() {
 
       // Close cart after successful checkout
       setShowCart(false);
-
-
 
     } catch (error) {
       console.error('Error during checkout:', error);
@@ -151,6 +170,36 @@ function App() {
     return cart.reduce((total, item) => total + item.quantity, 0);
   };
 
+  const handleCartClick = () => {
+    if (!currentUser) {
+      setShowLogin(true);
+      return;
+    }
+    setShowCart(!showCart);
+  };
+
+  const handleLoginClick = () => {
+    setShowLogin(true);
+  };
+
+  const handleCloseLogin = () => {
+    setShowLogin(false);
+  };
+
+  const handleCloseRegister = () => {
+    setShowRegister(false);
+  };
+
+  const switchToRegister = () => {
+    setShowLogin(false);
+    setShowRegister(true);
+  };
+
+  const switchToLogin = () => {
+    setShowRegister(false);
+    setShowLogin(true);
+  };
+
   if (loading) {
     return <div className="loading">Loading...</div>;
   }
@@ -159,10 +208,11 @@ function App() {
     <div className="App">
       <Header
         cartItemCount={getCartItemCount()}
-        onCartClick={() => setShowCart(!showCart)}
+        onCartClick={handleCartClick}
         onSearch={handleSearch}
         searchQuery={searchQuery}
         isKameleoonActive={isActive}
+        onLoginClick={handleLoginClick}
       />
 
       <main className="main-content">
@@ -182,7 +232,29 @@ function App() {
           />
         )}
       </main>
+
+      {showLogin && (
+        <Login
+          onClose={handleCloseLogin}
+          switchToRegister={switchToRegister}
+        />
+      )}
+
+      {showRegister && (
+        <Register
+          onClose={handleCloseRegister}
+          switchToLogin={switchToLogin}
+        />
+      )}
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

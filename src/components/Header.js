@@ -1,10 +1,21 @@
 import React from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import './Header.css';
 
-const Header = ({ cartItemCount, onCartClick, onSearch, searchQuery, isKameleoonActive }) => {
+const Header = ({ cartItemCount, onCartClick, onSearch, searchQuery, isKameleoonActive, onLoginClick }) => {
+  const { currentUser, logout } = useAuth();
+
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     onSearch(searchQuery);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Failed to log out:', error);
+    }
   };
 
   return (
@@ -25,9 +36,30 @@ const Header = ({ cartItemCount, onCartClick, onSearch, searchQuery, isKameleoon
           </button>
         </form>
         
-        <button className="cart-button" onClick={onCartClick}>
-          🛒 Cart ({cartItemCount})
-        </button>
+        <div className="header-actions">
+          {currentUser ? (
+            <>
+              <span className="user-welcome">
+                Welcome, {currentUser.displayName || currentUser.email}!
+              </span>
+              <button className="cart-button" onClick={onCartClick}>
+                🛒 Cart ({cartItemCount})
+              </button>
+              <button className="logout-button" onClick={handleLogout}>
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <button className="login-button" onClick={onLoginClick}>
+                Login
+              </button>
+              <button className="cart-button disabled" disabled>
+                🛒 Cart (0)
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </header>
   );
