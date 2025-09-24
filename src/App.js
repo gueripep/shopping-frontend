@@ -10,7 +10,6 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { useData, useFeatureFlag, useInitialize, useVisitorCode } from '@kameleoon/react-sdk';
 
 
-
 const API_BASE_URL = 'https://api.gueripep.com';
 
 function AppContent() {
@@ -44,7 +43,6 @@ function AppContent() {
 
   const fetchCart = useCallback(async () => {
     if (!currentUser) return;
-    
     try {
       const response = await axios.get(`${API_BASE_URL}/cart/${currentUser.uid}`);
       setCart(response.data);

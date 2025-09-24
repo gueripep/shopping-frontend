@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -9,6 +9,12 @@ import {
   sendPasswordResetEmail
 } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase/configuration';
+import {
+  useInitialize,
+  useVisitorCode,
+  useData,
+  CustomData,
+} from '@kameleoon/react-sdk';
 
 const AuthContext = createContext();
 
@@ -18,6 +24,32 @@ export function useAuth() {
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
+  const { initialize } = useInitialize();
+  const { getVisitorCode } = useVisitorCode();
+  const { addData, flush } = useData();
+
+  const setCurrentUserAndSetCustomData = useCallback(async (user) => {
+    setCurrentUser(user); 
+
+    try {
+      await initialize();
+      const visitorCode = getVisitorCode();
+      
+      // Create custom data with user ID for cross-device tracking
+      const userId = user.uid;
+      if(!userId) return;
+      console.log('Setting Kameleoon custom data for user ID:', user);
+      const customData = new CustomData('user_id', userId );
+      
+      // Add the custom data to Kameleoon
+      addData(visitorCode, customData);
+      
+      // Flush the data immediately to ensure it's sent to Kameleoon servers
+      flush({ visitorCode, instant: true });
+    } catch (error) {
+      console.error('Error setting Kameleoon data:', error);
+    }
+  }, [initialize, getVisitorCode, addData, flush]);
   const [loading, setLoading] = useState(true);
 
   // Sign up with email and password
@@ -66,12 +98,12 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
+      setCurrentUserAndSetCustomData(user);
       setLoading(false);
     });
 
     return unsubscribe;
-  }, []);
+  }, [setCurrentUserAndSetCustomData]);
 
   const value = {
     currentUser,
