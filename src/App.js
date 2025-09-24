@@ -126,6 +126,28 @@ function AppContent() {
         quantity: 1
       });
       setCart(response.data);
+
+      // Find the product details for GTM tracking
+      const product = products.find(p => p.id === productId);
+      
+      // Push to dataLayer for GTM - this will trigger your GTM trigger
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        'event': 'add_to_cart',
+        'ecommerce': {
+          'currency': 'USD',
+          'value': product?.price || 0,
+          'items': [{
+            'item_id': productId,
+            'item_name': product?.name || 'Unknown Product',
+            'item_category': product?.category || 'Unknown',
+            'price': product?.price || 0,
+            'quantity': 1
+          }]
+        },
+        'visitor_code': visitorCode // Include for Kameleoon correlation
+      });
+
     } catch (error) {
       console.error('Error adding to cart:', error);
     }
@@ -212,7 +234,7 @@ function AppContent() {
   const trackCategorySelection = (category) => {
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
-      'event': 'page_view',
+      'event': 'category_view',
       'content_group': category || ALL_CATEGORIES
     });
   };
