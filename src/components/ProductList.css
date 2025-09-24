@@ -10,6 +10,16 @@
   color: #2c3e50;
 }
 
+.products-header {
+  margin-bottom: 2rem;
+}
+
+.products-header h2 {
+  text-align: center;
+  color: #2c3e50;
+  margin: 0;
+}
+
 .products-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));

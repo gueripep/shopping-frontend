@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
 import './App.css';
 import ProductList from './components/ProductList';
@@ -10,7 +10,11 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { useData, useFeatureFlag, useInitialize, useVisitorCode } from '@kameleoon/react-sdk';
 
 
-const API_BASE_URL = 'https://api.gueripep.com';
+const API_BASE_URL = process.env.NODE_ENV === 'development'
+  ? 'http://localhost:5001'
+  : 'https://api.gueripep.com';
+
+const ALL_CATEGORIES = 'All Categories';
 
 function AppContent() {
   const [products, setProducts] = useState([]);
@@ -22,7 +26,11 @@ function AppContent() {
   const [isActive, setIsActive] = useState(false);
   const [visitorCode, setVisitorCode] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
   const featureKey = 'shopping_test';
+  const hasTrackedInitialView = useRef(false);
 
   const { currentUser } = useAuth();
   const { initialize } = useInitialize();
@@ -54,10 +62,19 @@ function AppContent() {
   useEffect(() => {
     init();
     fetchProducts();
+    fetchCategories();
     if (currentUser) {
       fetchCart();
     }
   }, [init, currentUser, fetchCart]);
+
+  // Track initial page view for "All Categories" only once when component mounts
+  useEffect(() => {
+    if (!hasTrackedInitialView.current) {
+      trackCategorySelection('');
+      hasTrackedInitialView.current = true;
+    }
+  }, []);
 
   const fetchProducts = async () => {
     try {
@@ -70,12 +87,37 @@ function AppContent() {
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/categories`);
+      setCategories(response.data);
+      setCategoriesLoading(false);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      setCategoriesLoading(false);
+    }
+  };
+
+  const fetchProductsByCategory = async (category) => {
+    if (!category) {
+      fetchProducts();
+      return;
+    }
+
+    try {
+      const response = await axios.get(`${API_BASE_URL}/products/category/${category}`);
+      setProducts(response.data);
+    } catch (error) {
+      console.error('Error fetching products by category:', error);
+    }
+  };
+
   const addToCart = async (productId) => {
     if (!currentUser) {
       setShowLogin(true);
       return;
     }
-    
+
     try {
       const response = await axios.post(`${API_BASE_URL}/cart/${currentUser.uid}`, {
         productId,
@@ -89,7 +131,7 @@ function AppContent() {
 
   const removeFromCart = async (productId) => {
     if (!currentUser) return;
-    
+
     try {
       const response = await axios.delete(`${API_BASE_URL}/cart/${currentUser.uid}/${productId}`);
       setCart(response.data);
@@ -100,7 +142,7 @@ function AppContent() {
 
   const updateCartQuantity = async (productId, quantity) => {
     if (!currentUser) return;
-    
+
     try {
       const response = await axios.put(`${API_BASE_URL}/cart/${currentUser.uid}/${productId}`, {
         quantity
@@ -116,7 +158,7 @@ function AppContent() {
       setShowLogin(true);
       return;
     }
-    
+
     try {
       const response = await axios.post(`${API_BASE_URL}/checkout/${currentUser.uid}`, {
         visitorCode: visitorCode  // Send the frontend visitor code to backend
@@ -161,7 +203,23 @@ function AppContent() {
 
   const handleSearch = (query) => {
     setSearchQuery(query);
+    setSelectedCategory(''); // Clear category filter when searching
     searchProducts(query);
+  };
+
+  const trackCategorySelection = (category) => {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      'event': 'page_view',
+      'content_group': category || ALL_CATEGORIES
+    });
+  };
+
+  const handleCategoryChange = (category) => {
+    trackCategorySelection(category);
+    setSelectedCategory(category);
+    setSearchQuery(''); // Clear search query when filtering by category
+    fetchProductsByCategory(category);
   };
 
   const getCartItemCount = () => {
@@ -226,7 +284,11 @@ function AppContent() {
         ) : (
           <ProductList
             products={products}
+            categories={categories}
+            selectedCategory={selectedCategory}
             onAddToCart={addToCart}
+            onCategoryChange={handleCategoryChange}
+            categoriesLoading={categoriesLoading}
           />
         )}
       </main>

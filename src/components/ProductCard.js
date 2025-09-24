@@ -14,6 +14,7 @@ const ProductCard = ({ product, onAddToCart }) => {
         className="product-image"
       />
       <div className="product-info">
+        <div className="product-category">{product.category}</div>
         <h3 className="product-name">{product.name}</h3>
         <p className="product-description">{product.description}</p>
         <div className="product-footer">
