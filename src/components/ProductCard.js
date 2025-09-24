@@ -1,13 +1,21 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './ProductCard.css';
 
 const ProductCard = ({ product, onAddToCart }) => {
-  const handleAddToCart = () => {
+  const navigate = useNavigate();
+  
+  const handleAddToCart = (e) => {
+    e.stopPropagation(); // Prevent navigation when clicking add to cart
     onAddToCart(product.id);
   };
 
+  const handleCardClick = () => {
+    navigate(`/product/${product.id}`);
+  };
+
   return (
-    <div className="product-card">
+    <div className="product-card" onClick={handleCardClick}>
       <img 
         src={product.image} 
         alt={product.name} 

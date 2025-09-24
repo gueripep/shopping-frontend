@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 import './App.css';
 import ProductList from './components/ProductList';
+import ProductPage from './components/ProductPage';
 import Cart from './components/Cart';
 import Header from './components/Header';
 import Login from './components/Login';
@@ -282,14 +284,30 @@ function AppContent() {
             onCheckout={handleCheckout}
           />
         ) : (
-          <ProductList
-            products={products}
-            categories={categories}
-            selectedCategory={selectedCategory}
-            onAddToCart={addToCart}
-            onCategoryChange={handleCategoryChange}
-            categoriesLoading={categoriesLoading}
-          />
+          <Routes>
+            <Route 
+              path="/" 
+              element={
+                <ProductList
+                  products={products}
+                  categories={categories}
+                  selectedCategory={selectedCategory}
+                  onAddToCart={addToCart}
+                  onCategoryChange={handleCategoryChange}
+                  categoriesLoading={categoriesLoading}
+                />
+              } 
+            />
+            <Route 
+              path="/product/:id" 
+              element={
+                <ProductPage
+                  onAddToCart={addToCart}
+                  onLoginRequired={handleLoginClick}
+                />
+              } 
+            />
+          </Routes>
         )}
       </main>
 
@@ -312,9 +330,11 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <Router>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </Router>
   );
 }
 
