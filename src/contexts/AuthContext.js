@@ -46,10 +46,8 @@ export function AuthProvider({ children }) {
       if (user && user.uid) {
         console.log('Setting Kameleoon custom data for user ID:', user);
         const customData = new CustomData('user_id', user.uid);
-        
         // Add the custom data to Kameleoon
         addData(visitorCode, customData);
-        
         // Flush the data immediately to ensure it's sent to Kameleoon servers
         flush({ visitorCode, instant: true });
       }

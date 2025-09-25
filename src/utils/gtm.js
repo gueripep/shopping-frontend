@@ -23,7 +23,7 @@ export const pushLoginEvent = (userId) => {
 };
 
 /**
- * Push user authentication status to dataLayer without login event
+ * Push user authentication status to dataLayer with status check event
  * Used for subsequent page loads when checking existing authentication
  * @param {string|null} userId - The user's unique identifier or null if not logged in
  */
@@ -33,16 +33,18 @@ export const pushUserStatus = (userId) => {
   if (userId) {
     // User is logged in
     window.dataLayer.push({
+      'event': 'user_status_check',
       'user_id': userId,
       'logged_in_status': 'logged-in'
     });
-    console.log('GTM: User status pushed (logged-in)', { userId });
+    console.log('GTM: User status event pushed (logged-in)', { userId });
   } else {
     // User is not logged in
     window.dataLayer.push({
+      'event': 'user_status_check',
       'logged_in_status': 'logged-out'
     });
-    console.log('GTM: User status pushed (logged-out)');
+    console.log('GTM: User status event pushed (logged-out)');
   }
 };
 
