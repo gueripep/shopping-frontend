@@ -15,6 +15,7 @@ import {
   useData,
   CustomData,
 } from '@kameleoon/react-sdk';
+import { pushUserStatus, pushLogoutEvent } from '../utils/gtm';
 
 const AuthContext = createContext();
 
@@ -24,6 +25,7 @@ export function useAuth() {
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const { initialize } = useInitialize();
   const { getVisitorCode } = useVisitorCode();
   const { addData, flush } = useData();
@@ -31,25 +33,30 @@ export function AuthProvider({ children }) {
   const setCurrentUserAndSetCustomData = useCallback(async (user) => {
     setCurrentUser(user); 
 
+    // Push user status to GTM dataLayer (without login event for page loads)
+    if (isInitialLoad) {
+      pushUserStatus(user ? user.uid : null);
+    }
+
     try {
       await initialize();
       const visitorCode = getVisitorCode();
       
       // Create custom data with user ID for cross-device tracking
-      const userId = user.uid;
-      if(!userId) return;
-      console.log('Setting Kameleoon custom data for user ID:', user);
-      const customData = new CustomData('user_id', userId );
-      
-      // Add the custom data to Kameleoon
-      addData(visitorCode, customData);
-      
-      // Flush the data immediately to ensure it's sent to Kameleoon servers
-      flush({ visitorCode, instant: true });
+      if (user && user.uid) {
+        console.log('Setting Kameleoon custom data for user ID:', user);
+        const customData = new CustomData('user_id', user.uid);
+        
+        // Add the custom data to Kameleoon
+        addData(visitorCode, customData);
+        
+        // Flush the data immediately to ensure it's sent to Kameleoon servers
+        flush({ visitorCode, instant: true });
+      }
     } catch (error) {
       console.error('Error setting Kameleoon data:', error);
     }
-  }, [initialize, getVisitorCode, addData, flush]);
+  }, [initialize, getVisitorCode, addData, flush, isInitialLoad]);
   const [loading, setLoading] = useState(true);
 
   // Sign up with email and password
@@ -78,6 +85,8 @@ export function AuthProvider({ children }) {
 
   // Sign out
   function logout() {
+    // Push logout event to GTM dataLayer
+    pushLogoutEvent();
     return signOut(auth);
   }
 
@@ -100,10 +109,14 @@ export function AuthProvider({ children }) {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUserAndSetCustomData(user);
       setLoading(false);
+      // After the first auth state change, no longer initial load
+      if (isInitialLoad) {
+        setIsInitialLoad(false);
+      }
     });
 
     return unsubscribe;
-  }, [setCurrentUserAndSetCustomData]);
+  }, [setCurrentUserAndSetCustomData, isInitialLoad]);
 
   const value = {
     currentUser,

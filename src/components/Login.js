@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { pushLoginEvent } from '../utils/gtm';
 import './Login.css';
 
 function Login({ onClose, switchToRegister }) {
@@ -15,7 +16,11 @@ function Login({ onClose, switchToRegister }) {
     try {
       setError('');
       setLoading(true);
-      await login(email, password);
+      const userCredential = await login(email, password);
+      
+      // Push login event to GTM dataLayer
+      pushLoginEvent(userCredential.user.uid);
+      
       onClose();
     } catch (error) {
       setError('Failed to log in: ' + error.message);
@@ -27,7 +32,11 @@ function Login({ onClose, switchToRegister }) {
     try {
       setError('');
       setLoading(true);
-      await signInWithGoogle();
+      const userCredential = await signInWithGoogle();
+      
+      // Push login event to GTM dataLayer
+      pushLoginEvent(userCredential.user.uid);
+      
       onClose();
     } catch (error) {
       setError('Failed to sign in with Google: ' + error.message);
