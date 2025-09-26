@@ -10,6 +10,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { useData, useFeatureFlag, useInitialize, useVisitorCode } from '@kameleoon/react-sdk';
+import { pushAddToCartEvent } from './utils/gtm';
 
 
 const API_BASE_URL = process.env.NODE_ENV === 'development'
@@ -130,23 +131,8 @@ function AppContent() {
       // Find the product details for GTM tracking
       const product = products.find(p => p.id === productId);
       
-      // Push to dataLayer for GTM - this will trigger your GTM trigger
-      window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({
-        'event': 'add_to_cart',
-        'ecommerce': {
-          'currency': 'USD',
-          'value': product?.price || 0,
-          'items': [{
-            'item_id': productId,
-            'item_name': product?.name || 'Unknown Product',
-            'item_category': product?.category || 'Unknown',
-            'price': product?.price || 0,
-            'quantity': 1
-          }]
-        },
-        'visitor_code': visitorCode // Include for Kameleoon correlation
-      });
+      // Push add to cart event to GTM
+      pushAddToCartEvent(product, 1, visitorCode);
 
     } catch (error) {
       console.error('Error adding to cart:', error);

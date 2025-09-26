@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
+import { useVisitorCode } from '@kameleoon/react-sdk';
+import { pushProductViewEvent } from '../utils/gtm';
 import './ProductPage.css';
 
 const API_BASE_URL = process.env.NODE_ENV === 'development'
@@ -12,10 +14,12 @@ const ProductPage = ({ onAddToCart, onLoginRequired }) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { currentUser } = useAuth();
+  const { getVisitorCode } = useVisitorCode();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const trackedProductRef = useRef(null);
 
   const fetchProduct = useCallback(async () => {
     try {
@@ -34,6 +38,20 @@ const ProductPage = ({ onAddToCart, onLoginRequired }) => {
   useEffect(() => {
     fetchProduct();
   }, [fetchProduct]);
+
+  // Reset tracked product when ID changes
+  useEffect(() => {
+    trackedProductRef.current = null;
+  }, [id]);
+
+  // Track product view event when product is successfully loaded
+  useEffect(() => {
+    if (product && !loading && !error && trackedProductRef.current !== product.id) {
+      const visitorCode = getVisitorCode();
+      pushProductViewEvent(product, visitorCode);
+      trackedProductRef.current = product.id;
+    }
+  }, [product, loading, error, getVisitorCode]);
 
   const handleAddToCart = () => {
     if (!currentUser) {
