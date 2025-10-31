@@ -35,12 +35,13 @@ function AppContent() {
   const featureKey = 'shopping_test';
   const hasTrackedInitialView = useRef(false);
 
+
+  //Kameleoon state
   const { currentUser } = useAuth();
   const { initialize } = useInitialize();
   const { getVisitorCode } = useVisitorCode();
-  const { isFeatureFlagActive } = useFeatureFlag();
+  const { isFeatureFlagActive, getVariation } = useFeatureFlag();
   const { trackConversion } = useData();
-
 
   const init = useCallback(async () => {
     await initialize();
@@ -48,6 +49,8 @@ function AppContent() {
     setVisitorCode(visitorCode);
     const isActive = isFeatureFlagActive({ visitorCode, featureKey });
     setIsActive(isActive);
+    const variation = getVariation({ visitorCode, featureKey });
+    console.log('Feature Variation:', variation);
     console.log('Visitor Code:', visitorCode);
     console.log('Feature Variation:', isActive); // Log the actual value, not the stale state
   }, [initialize, getVisitorCode, isFeatureFlagActive, featureKey]);
