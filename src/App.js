@@ -26,8 +26,8 @@ function AppContent() {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [isActive, setIsActive] = useState(false);
   const [visitorCode, setVisitorCode] = useState('');
+  const [kameleoonVariation, setKameleoonVariation] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -36,24 +36,24 @@ function AppContent() {
   const hasTrackedInitialView = useRef(false);
 
 
-  //Kameleoon state
+  //Kameleoon hooks
   const { currentUser } = useAuth();
   const { initialize } = useInitialize();
   const { getVisitorCode } = useVisitorCode();
-  const { isFeatureFlagActive, getVariation } = useFeatureFlag();
+  const { getVariation } = useFeatureFlag();
   const { trackConversion } = useData();
 
   const init = useCallback(async () => {
     await initialize();
     const visitorCode = getVisitorCode();
     setVisitorCode(visitorCode);
-    const isActive = isFeatureFlagActive({ visitorCode, featureKey });
-    setIsActive(isActive);
+    
     const variation = getVariation({ visitorCode, featureKey });
-    console.log('Feature Variation:', variation);
+    setKameleoonVariation(variation);
+
     console.log('Visitor Code:', visitorCode);
-    console.log('Feature Variation:', isActive); // Log the actual value, not the stale state
-  }, [initialize, getVisitorCode, isFeatureFlagActive, featureKey]);
+    console.log('Feature Variation:', variation);
+  }, [initialize, getVisitorCode, getVariation, featureKey]);
 
   const fetchCart = useCallback(async () => {
     if (!currentUser) return;
@@ -280,7 +280,7 @@ function AppContent() {
         onCartClick={handleCartClick}
         onSearch={handleSearch}
         searchQuery={searchQuery}
-        isKameleoonActive={isActive}
+        kameleoonVariation={kameleoonVariation}
         onLoginClick={handleLoginClick}
       />
 

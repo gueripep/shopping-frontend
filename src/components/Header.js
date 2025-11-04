@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import './Header.css';
 
-const Header = ({ cartItemCount, onCartClick, onSearch, searchQuery, isKameleoonActive, onLoginClick }) => {
+const Header = ({ cartItemCount, onCartClick, onSearch, searchQuery, kameleoonVariation, onLoginClick }) => {
   const { currentUser, logout } = useAuth();
 
   const handleSearchSubmit = (e) => {
@@ -18,8 +18,12 @@ const Header = ({ cartItemCount, onCartClick, onSearch, searchQuery, isKameleoon
     }
   };
 
+  const divStyle = useMemo(() => ({
+    backgroundColor: kameleoonVariation?.variables?.get("header_color")?.value,
+  }), [kameleoonVariation]);
+
   return (
-    <header className={`header ${isKameleoonActive ? 'kameleoon-active-header' : ''}`}>
+    <header style={divStyle} className='header'>
       <div className="header-content">
         <h1 className="logo">🛒 ShopEasy</h1>
         
