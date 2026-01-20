@@ -40,7 +40,7 @@ function AppContent() {
   const { currentUser } = useAuth();
   const { initialize } = useInitialize();
   const { getVisitorCode } = useVisitorCode();
-  const { getVariation } = useFeatureFlag();
+  const { getVariation, getVariations } = useFeatureFlag();
   const { trackConversion } = useData();
 
   const init = useCallback(async () => {
@@ -49,11 +49,13 @@ function AppContent() {
     setVisitorCode(visitorCode);
     
     const variation = getVariation({ visitorCode, featureKey });
+    const variations = getVariations({visitorCode})
     setKameleoonVariation(variation);
 
     console.log('Visitor Code:', visitorCode);
     console.log('Feature Variation:', variation);
-  }, [initialize, getVisitorCode, getVariation, featureKey]);
+    console.log('All Variations:', variations);
+  }, [initialize, getVisitorCode, getVariation, featureKey, getVariations]);
 
   const fetchCart = useCallback(async () => {
     if (!currentUser) return;
