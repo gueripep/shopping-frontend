@@ -31,7 +31,7 @@ export function AuthProvider({ children }) {
   const { addData, flush } = useData();
 
   const setCurrentUserAndSetCustomData = useCallback(async (user) => {
-    setCurrentUser(user); 
+    setCurrentUser(user);
 
     // Push user status to GTM dataLayer (without login event for page loads)
     if (isInitialLoad) {
@@ -41,9 +41,17 @@ export function AuthProvider({ children }) {
     try {
       await initialize();
       const visitorCode = getVisitorCode();
-      
+
       // Create custom data with user ID for cross-device tracking
       if (user && user.uid) {
+        // Send user identity to Segment
+        if (window.analytics) {
+          window.analytics.identify(user.uid, {
+            email: user.email,
+            name: user.displayName
+          });
+        }
+
         console.log('Setting Kameleoon custom data for user ID:', user);
         const customData = new CustomData('user_id', user.uid);
         // Add the custom data to Kameleoon

@@ -44,17 +44,22 @@ function AppContent() {
   const { trackConversion } = useData();
 
   const init = useCallback(async () => {
-    await initialize();
-    const visitorCode = getVisitorCode();
-    setVisitorCode(visitorCode);
-    
-    const variation = getVariation({ visitorCode, featureKey });
-    const variations = getVariations({visitorCode})
-    setKameleoonVariation(variation);
+    try {
+      await initialize();
+      const code = getVisitorCode();
+      setVisitorCode(code);
 
-    console.log('Visitor Code:', visitorCode);
-    console.log('Feature Variation:', variation);
-    console.log('All Variations:', variations);
+      const variation = getVariation({ visitorCode: code, featureKey });
+      const variations = getVariations({ visitorCode: code });
+      setKameleoonVariation(variation);
+
+      console.log('Kameleoon - Visitor Code:', code);
+      console.log('Kameleoon - Feature Variation:', variation);
+      console.log('Kameleoon - All Variations:', variations);
+    } catch (error) {
+      console.warn('Kameleoon - Failed to initialize SDK (likely blocked or network error):', error);
+      // Fallback: the app continues to work without experiment variations
+    }
   }, [initialize, getVisitorCode, getVariation, featureKey, getVariations]);
 
   const fetchCart = useCallback(async () => {
@@ -135,7 +140,7 @@ function AppContent() {
 
       // Find the product details for GTM tracking
       const product = products.find(p => p.id === productId);
-      
+
       // Push add to cart event to GTM
       pushAddToCartEvent(product, 1, visitorCode);
 
@@ -298,8 +303,8 @@ function AppContent() {
           />
         ) : (
           <Routes>
-            <Route 
-              path="/" 
+            <Route
+              path="/"
               element={
                 <ProductList
                   products={products}
@@ -309,16 +314,16 @@ function AppContent() {
                   onCategoryChange={handleCategoryChange}
                   categoriesLoading={categoriesLoading}
                 />
-              } 
+              }
             />
-            <Route 
-              path="/product/:id" 
+            <Route
+              path="/product/:id"
               element={
                 <ProductPage
                   onAddToCart={addToCart}
                   onLoginRequired={handleLoginClick}
                 />
-              } 
+              }
             />
           </Routes>
         )}
