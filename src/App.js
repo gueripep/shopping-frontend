@@ -13,6 +13,9 @@ import { useData, useFeatureFlag, useInitialize, useVisitorCode } from '@kameleo
 import { pushAddToCartEvent } from './utils/gtm';
 
 
+// Configure Axios to always send/receive cookies for CORS requests
+axios.defaults.withCredentials = true;
+
 const API_BASE_URL = process.env.NODE_ENV === 'development'
   ? 'http://localhost:5001'
   : 'https://api.gueripep.com';
@@ -88,6 +91,32 @@ function AppContent() {
       hasTrackedInitialView.current = true;
     }
   }, []);
+
+  // Axeptio Consent Synchronization
+  useEffect(() => {
+    // 1. Wait for Axeptio initialization
+    if (typeof window._axcb === "undefined") {
+      window._axcb = [];
+    }
+
+    window._axcb.push((axeptio) => {
+      axeptio.on("cookies:complete", async (choices) => {
+        const consent = !!choices.kameleoon;
+        console.log(`[Axeptio] Consent choice received: ${consent}. Synchronizing with backend...`);
+
+        try {
+          // 2. Synchronize choice with backend to trigger the server-side Set-Cookie header
+          await axios.post(`${API_BASE_URL}/consent`, { 
+            consent,
+            visitorCode // Current visitor code for identification
+          });
+          console.log('[Axeptio] Successfully synchronized consent');
+        } catch (error) {
+          console.error('[Axeptio] Failed to synchronize consent:', error);
+        }
+      });
+    });
+  }, [visitorCode]);
 
   const fetchProducts = async () => {
     try {
