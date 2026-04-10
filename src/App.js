@@ -43,7 +43,7 @@ function AppContent() {
   const { currentUser } = useAuth();
   const { initialize } = useInitialize();
   const { getVisitorCode } = useVisitorCode();
-  const { getVariation, getVariations } = useFeatureFlag();
+  const { getVariation } = useFeatureFlag();
   const { trackConversion } = useData();
 
   const init = useCallback(async () => {
@@ -53,7 +53,7 @@ function AppContent() {
       setVisitorCode(code);
 
       const variation = getVariation({ visitorCode: code, featureKey });
-      const variations = getVariations({ visitorCode: code });
+
       setKameleoonVariation(variation);
 
 
@@ -61,7 +61,7 @@ function AppContent() {
       console.warn('Kameleoon - Failed to initialize SDK (likely blocked or network error):', error);
       // Fallback: the app continues to work without experiment variations
     }
-  }, [initialize, getVisitorCode, getVariation, featureKey, getVariations]);
+  }, [initialize, getVisitorCode, getVariation, featureKey]);
 
   const fetchCart = useCallback(async () => {
     if (!currentUser) return;
