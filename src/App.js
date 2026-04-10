@@ -56,9 +56,7 @@ function AppContent() {
       const variations = getVariations({ visitorCode: code });
       setKameleoonVariation(variation);
 
-      console.log('Kameleoon - Visitor Code:', code);
-      console.log('Kameleoon - Feature Variation:', variation);
-      console.log('Kameleoon - All Variations:', variations);
+
     } catch (error) {
       console.warn('Kameleoon - Failed to initialize SDK (likely blocked or network error):', error);
       // Fallback: the app continues to work without experiment variations
@@ -102,7 +100,7 @@ function AppContent() {
     window._axcb.push((axeptio) => {
       axeptio.on("cookies:complete", async (choices) => {
         const consent = !!choices.kameleoon;
-        console.log(`[Axeptio] Consent choice received: ${consent}. Synchronizing with backend...`);
+
 
         try {
           // 2. Synchronize choice with backend to trigger the server-side Set-Cookie header
@@ -110,7 +108,7 @@ function AppContent() {
             consent,
             visitorCode // Current visitor code for identification
           });
-          console.log('[Axeptio] Successfully synchronized consent');
+
         } catch (error) {
           console.error('[Axeptio] Failed to synchronize consent:', error);
         }
@@ -212,7 +210,7 @@ function AppContent() {
       const response = await axios.post(`${API_BASE_URL}/checkout/${currentUser.uid}`, {
         visitorCode: visitorCode  // Send the frontend visitor code to backend
       });
-      console.log('Checkout successful:', response.data);
+
 
       // confirm kameleoon goal
       trackConversion({

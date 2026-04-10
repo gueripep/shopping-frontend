@@ -52,7 +52,7 @@ export function AuthProvider({ children }) {
           });
         }
 
-        console.log('Setting Kameleoon custom data for user ID:', user);
+
         const customData = new CustomData('user_id', user.uid);
         // Add the custom data to Kameleoon
         addData(visitorCode, customData);

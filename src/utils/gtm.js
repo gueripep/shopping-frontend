@@ -19,7 +19,7 @@ export const pushLoginEvent = (userId) => {
     'user_id': userId,
     'logged_in_status': 'logged-in'
   });
-  console.log('GTM: Login event pushed', { userId });
+
 };
 
 /**
@@ -37,14 +37,14 @@ export const pushUserStatus = (userId) => {
       'user_id': userId,
       'logged_in_status': 'logged-in'
     });
-    console.log('GTM: User status event pushed (logged-in)', { userId });
+
   } else {
     // User is not logged in
     window.dataLayer.push({
       'event': 'user_status_check',
       'logged_in_status': 'logged-out'
     });
-    console.log('GTM: User status event pushed (logged-out)');
+
   }
 };
 
@@ -57,7 +57,7 @@ export const pushLogoutEvent = () => {
     'event': 'logout',
     'logged_in_status': 'logged-out'
   });
-  console.log('GTM: Logout event pushed');
+
 };
 
 /**
@@ -94,12 +94,7 @@ export const pushAddToCartEvent = (product, quantity = 1, visitorCode = null) =>
   }
 
   window.dataLayer.push(eventData);
-  console.log('GTM: Add to cart event pushed', { 
-    productId: product?.id, 
-    productName: product?.name, 
-    quantity,
-    visitorCode 
-  });
+
 };
 
 /**
@@ -135,9 +130,5 @@ export const pushProductViewEvent = (product, visitorCode = null) => {
   }
 
   window.dataLayer.push(eventData);
-  console.log('GTM: Product view event pushed', { 
-    productId: product?.id, 
-    productName: product?.name,
-    visitorCode 
-  });
+
 };
