@@ -7,8 +7,6 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    env:
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -35,4 +33,3 @@ jobs:
           target: "/home/poulbleu_du38/shopping-frontend/build"
           strip_components: 1
           rm: true
-
