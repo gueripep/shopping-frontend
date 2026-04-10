@@ -7,6 +7,8 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -14,13 +16,12 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '21'
           cache: 'npm'
-          cache-dependency-path: shopping-frontend/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install and Build
         run: |
-          cd shopping-frontend
           npm install
           npm run build
 
@@ -30,7 +31,8 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "shopping-frontend/build/*"
+          source: "build/*"
           target: "/home/poulbleu_du38/shopping-frontend/build"
-          strip_components: 2
+          strip_components: 1
           rm: true
+
