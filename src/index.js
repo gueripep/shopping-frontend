@@ -9,6 +9,7 @@ import { createClient, Environment, KameleoonProvider } from '@kameleoon/react-s
 const configuration = {
   updateInterval: 1,
   environment: Environment.Production,
+  domain: window.location.hostname.includes('gueripep.com') ? '.gueripep.com' : undefined,
 };
 const kameleoonClient = createClient({ siteCode: 'dnkd8eslzh', configuration });
 

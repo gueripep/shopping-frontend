@@ -16,11 +16,13 @@ const ProductCard = ({ product, onAddToCart }) => {
 
   return (
     <div className="product-card" onClick={handleCardClick}>
-      <img 
-        src={product.image} 
-        alt={product.name} 
-        className="product-image"
-      />
+      <div className="product-image-container">
+        <img 
+          src={product.image} 
+          alt={product.name} 
+          className="product-image"
+        />
+      </div>
       <div className="product-info">
         <div className="product-category">{product.category}</div>
         <h3 className="product-name">{product.name}</h3>
