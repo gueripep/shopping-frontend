@@ -27,10 +27,11 @@ const Header = ({ cartItemCount, onCartClick, onSearch, searchQuery, kameleoonVa
       <div className="header-content">
         <div className="logo-container">
           <img 
-            src="https://cdn.prod.website-files.com/685945d76d7a305336412a93/686bcac753076d6555ec57b9_Logo%20Kameleoon%20White.svg" 
-            alt="Kameleoon" 
+            src="/logo-easyshop.png" 
+            alt="EasyShop" 
             className="logo-img"
           />
+          <span className="logo-text">EasyShop</span>
         </div>
         
         <form className="search-form" onSubmit={handleSearchSubmit}>
