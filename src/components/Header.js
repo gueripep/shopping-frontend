@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import './Header.css';
 
@@ -25,14 +26,16 @@ const Header = ({ cartItemCount, onCartClick, onSearch, searchQuery, kameleoonVa
   return (
     <header style={headerStyle} className='header'>
       <div className="header-content">
-        <div className="logo-container">
-          <img 
-            src="/logo-easyshop.png" 
-            alt="EasyShop" 
-            className="logo-img"
-          />
-          <span className="logo-text">EasyShop</span>
-        </div>
+        <Link to="/" className="logo-link">
+          <div className="logo-container">
+            <img 
+              src="/logo-easyshop.png" 
+              alt="EasyShop" 
+              className="logo-img"
+            />
+            <span className="logo-text">EasyShop</span>
+          </div>
+        </Link>
         
         <form className="search-form" onSubmit={handleSearchSubmit}>
           <div className="search-input-wrapper">

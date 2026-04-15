@@ -1,8 +1,14 @@
-import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import CartItem from './CartItem';
 import './Cart.css';
 
-const Cart = ({ cart, products, isKameleoonActive, onRemove, onUpdateQuantity, onClose, onCheckout }) => {
+const Cart = ({ cart, products, isKameleoonActive, onRemove, onUpdateQuantity, onCheckout }) => {
+  const navigate = useNavigate();
+  
+  const handleClose = () => {
+    navigate(-1); // Go back to previous page
+  };
+
   const getCartItemsWithDetails = () => {
     return cart.map(cartItem => {
       const product = products.find(p => p.id === cartItem.productId);
@@ -29,7 +35,7 @@ const Cart = ({ cart, products, isKameleoonActive, onRemove, onUpdateQuantity, o
     <div className="cart">
       <div className="cart-header">
         <h2>Shopping Cart</h2>
-        <button className="close-cart-btn" onClick={onClose}>
+        <button className="close-cart-btn" onClick={handleClose}>
           ✕
         </button>
       </div>
@@ -37,7 +43,7 @@ const Cart = ({ cart, products, isKameleoonActive, onRemove, onUpdateQuantity, o
       {cartItems.length === 0 ? (
         <div className="empty-cart">
           <p>Your cart is empty</p>
-          <button className="continue-shopping-btn" onClick={onClose}>
+          <button className="continue-shopping-btn" onClick={handleClose}>
             Continue Shopping
           </button>
         </div>
@@ -62,7 +68,7 @@ const Cart = ({ cart, products, isKameleoonActive, onRemove, onUpdateQuantity, o
             </div>
             
             <div className="cart-actions">
-              <button className="continue-shopping-btn" onClick={onClose}>
+              <button className="continue-shopping-btn" onClick={handleClose}>
                 Continue Shopping
               </button>
               <button className="checkout-btn" onClick={onCheckout} id='kameleoon-checkout-btn'>

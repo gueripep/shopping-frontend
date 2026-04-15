@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './App.css';
 import ProductList from './components/ProductList';
@@ -25,7 +25,6 @@ const ALL_CATEGORIES = 'All Categories';
 function AppContent() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
-  const [showCart, setShowCart] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -45,6 +44,7 @@ function AppContent() {
   const { getVisitorCode } = useVisitorCode();
   const { getVariation } = useFeatureFlag();
   const { trackConversion } = useData();
+  const navigate = useNavigate();
 
   const init = useCallback(async () => {
     try {
@@ -225,8 +225,8 @@ function AppContent() {
       // Show success message or redirect
       alert(`Checkout successful! Order ID: ${response.data.order.orderId}`);
 
-      // Close cart after successful checkout
-      setShowCart(false);
+      // No need to close cart state here as it's now a page
+
 
     } catch (error) {
       console.error('Error during checkout:', error);
@@ -278,7 +278,7 @@ function AppContent() {
       setShowLogin(true);
       return;
     }
-    setShowCart(!showCart);
+    navigate('/cart');
   };
 
   const handleLoginClick = () => {
@@ -319,41 +319,42 @@ function AppContent() {
       />
 
       <main className="main-content">
-        {showCart ? (
-          <Cart
-            cart={cart}
-            products={products}
-            onRemove={removeFromCart}
-            onUpdateQuantity={updateCartQuantity}
-            onClose={() => setShowCart(false)}
-            onCheckout={handleCheckout}
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <ProductList
+                products={products}
+                categories={categories}
+                selectedCategory={selectedCategory}
+                onAddToCart={addToCart}
+                onCategoryChange={handleCategoryChange}
+                categoriesLoading={categoriesLoading}
+              />
+            }
           />
-        ) : (
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <ProductList
-                  products={products}
-                  categories={categories}
-                  selectedCategory={selectedCategory}
-                  onAddToCart={addToCart}
-                  onCategoryChange={handleCategoryChange}
-                  categoriesLoading={categoriesLoading}
-                />
-              }
-            />
-            <Route
-              path="/product/:id"
-              element={
-                <ProductPage
-                  onAddToCart={addToCart}
-                  onLoginRequired={handleLoginClick}
-                />
-              }
-            />
-          </Routes>
-        )}
+          <Route
+            path="/product/:id"
+            element={
+              <ProductPage
+                onAddToCart={addToCart}
+                onLoginRequired={handleLoginClick}
+              />
+            }
+          />
+          <Route
+            path="/cart"
+            element={
+              <Cart
+                cart={cart}
+                products={products}
+                onRemove={removeFromCart}
+                onUpdateQuantity={updateCartQuantity}
+                onCheckout={handleCheckout}
+              />
+            }
+          />
+        </Routes>
       </main>
 
       {showLogin && (

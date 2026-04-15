@@ -21,6 +21,12 @@
   padding: 0 24px;
 }
 
+.logo-link {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
 .logo-container {
   display: flex;
   align-items: center;
@@ -174,17 +180,65 @@
 @media (max-width: 768px) {
   .header {
     height: auto;
-    padding: 16px 0;
+    padding: 12px 0;
   }
   
   .header-content {
-    flex-direction: column;
-    gap: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 0 16px;
+  }
+  
+  .logo-container {
+    order: 1;
+    gap: 8px;
+  }
+  
+  .logo-img {
+    height: 32px;
+  }
+  
+  .logo-text {
+    font-size: 20px;
+  }
+
+  .header-actions {
+    order: 2;
+    gap: 12px;
   }
   
   .search-form {
-    margin: 0;
+    margin: 8px 0 4px 0;
     width: 100%;
     order: 3;
+  }
+
+  .search-input {
+    padding: 12px 48px 12px 20px;
+    font-size: 16px; /* Prevents auto-zoom on iOS */
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .user-welcome {
+    display: none; /* Hide welcome text on small screens */
+  }
+
+  .login-button, .logout-button {
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-text {
+    display: none; /* Only show icon on extremely small screens */
+  }
+  
+  .header-content {
+    padding: 0 12px;
   }
 }
