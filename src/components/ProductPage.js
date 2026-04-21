@@ -24,7 +24,9 @@ const ProductPage = ({ onAddToCart, onLoginRequired }) => {
   const fetchProduct = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_BASE_URL}/products/${id}`);
+      const response = await axios.get(`${API_BASE_URL}/products/${id}`, {
+        headers: { 'X-Page-URL': window.location.href }
+      });
       setProduct(response.data);
       setError(null);
     } catch (error) {

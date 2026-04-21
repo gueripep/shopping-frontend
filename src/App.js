@@ -9,7 +9,7 @@ import Header from './components/Header';
 import Login from './components/Login';
 import Register from './components/Register';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { useData, useFeatureFlag, useInitialize, useVisitorCode } from '@kameleoon/react-sdk';
+import { CustomData, useData, useFeatureFlag, useInitialize, useVisitorCode } from '@kameleoon/react-sdk';
 import { pushAddToCartEvent } from './utils/gtm';
 
 
@@ -34,6 +34,7 @@ function AppContent() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const { addData, flush } = useData();
   const featureKey = 'shopping_test';
   const hasTrackedInitialView = useRef(false);
 
@@ -54,14 +55,23 @@ function AppContent() {
 
       const variation = getVariation({ visitorCode: code, featureKey });
 
-      setKameleoonVariation(variation);
+      console.log('Kameleoon variation:', variation.key);
 
+      //example of setting widget information in side a flag
+      localStorage.setItem('variation_name', variation.key);
+      const customData = new CustomData(4, variation.key);
+      addData(code, customData);
+      flush();
+
+      
+
+      setKameleoonVariation(variation);
 
     } catch (error) {
       console.warn('Kameleoon - Failed to initialize SDK (likely blocked or network error):', error);
       // Fallback: the app continues to work without experiment variations
     }
-  }, [initialize, getVisitorCode, getVariation, featureKey]);
+  }, [initialize, getVisitorCode, getVariation, featureKey, addData, flush]);
 
   const fetchCart = useCallback(async () => {
     if (!currentUser) return;
@@ -104,7 +114,7 @@ function AppContent() {
 
         try {
           // 2. Synchronize choice with backend to trigger the server-side Set-Cookie header
-          await axios.post(`${API_BASE_URL}/consent`, { 
+          await axios.post(`${API_BASE_URL}/consent`, {
             consent,
             visitorCode // Current visitor code for identification
           });
