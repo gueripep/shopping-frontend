@@ -221,13 +221,17 @@ function AppContent() {
         visitorCode: visitorCode  // Send the frontend visitor code to backend
       });
 
-
-      // confirm kameleoon goal
-      trackConversion({
-        visitorCode,
-        goalId: 392014, // The ID for your "purchase" goal
-        revenue: response.data.order.total// Optional: include the revenue from the conversion
-      });
+      // The order succeeded once we're here. Kameleoon conversion tracking is
+      // best-effort — a tracking failure must NOT make the checkout look failed.
+      try {
+        trackConversion({
+          visitorCode,
+          goalId: 392014, // The ID for your "purchase" goal
+          revenue: Number(response.data.order.total) // SDK expects a number, not a string
+        });
+      } catch (trackingError) {
+        console.warn('Kameleoon trackConversion failed (order still succeeded):', trackingError);
+      }
 
       // Update local cart state to reflect empty cart
       setCart([]);
