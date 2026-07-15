@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import './Header.css';
 
-const Header = ({ cartItemCount, onCartClick, onSearch, searchQuery, kameleoonVariation, onLoginClick }) => {
+const Header = ({ cartItemCount, onCartClick, onSearch, searchQuery, onLoginClick }) => {
   const { currentUser, logout } = useAuth();
 
   const handleSearchSubmit = (e) => {
@@ -19,12 +19,8 @@ const Header = ({ cartItemCount, onCartClick, onSearch, searchQuery, kameleoonVa
     }
   };
 
-  const headerStyle = useMemo(() => ({
-    backgroundColor: kameleoonVariation?.variables?.get("header_color")?.value || 'var(--secondary-bg)',
-  }), [kameleoonVariation]);
-
   return (
-    <header style={headerStyle} className='header'>
+    <header className='header'>
       <div className="header-content">
         <Link to="/" className="logo-link">
           <div className="logo-container">

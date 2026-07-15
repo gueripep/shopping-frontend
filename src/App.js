@@ -10,7 +10,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { CustomData, useData, useFeatureFlag, useInitialize, useVisitorCode } from '@kameleoon/react-sdk';
-import { pushAddToCartEvent } from './utils/gtm';
+import { pushAddToCartEvent, pushPurchaseEvent } from './utils/gtm';
 
 
 // Configure Axios to always send/receive cookies for CORS requests
@@ -233,6 +233,13 @@ function AppContent() {
         console.warn('Kameleoon trackConversion failed (order still succeeded):', trackingError);
       }
 
+      // Push purchase event to GTM dataLayer
+      const purchasedItems = cart.map(item => ({
+        product: products.find(p => p.id === item.productId),
+        quantity: item.quantity
+      }));
+      pushPurchaseEvent(response.data.order, purchasedItems, visitorCode);
+
       // Update local cart state to reflect empty cart
       setCart([]);
 
@@ -328,7 +335,6 @@ function AppContent() {
         onCartClick={handleCartClick}
         onSearch={handleSearch}
         searchQuery={searchQuery}
-        kameleoonVariation={kameleoonVariation}
         onLoginClick={handleLoginClick}
       />
 

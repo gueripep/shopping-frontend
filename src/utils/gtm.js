@@ -98,6 +98,42 @@ export const pushAddToCartEvent = (product, quantity = 1, visitorCode = null) =>
 };
 
 /**
+ * Push purchase event to GTM dataLayer when checkout completes successfully
+ * @param {Object} order - The completed order
+ * @param {string} order.orderId - Order ID
+ * @param {number} order.total - Order total
+ * @param {Array} items - Cart items with product details
+ * @param {string} visitorCode - Visitor code for Kameleoon correlation
+ */
+export const pushPurchaseEvent = (order, items = [], visitorCode = null) => {
+  initializeDataLayer();
+
+  const eventData = {
+    'event': 'purchase',
+    'ecommerce': {
+      'transaction_id': order?.orderId || 'unknown',
+      'currency': 'USD',
+      'value': Number(order?.total) || 0,
+      'items': items.map(({ product, quantity }) => ({
+        'item_id': product?.id || 'unknown',
+        'item_name': product?.name || 'Unknown Product',
+        'item_category': product?.category || 'Unknown',
+        'price': product?.price || 0,
+        'quantity': quantity
+      }))
+    }
+  };
+
+  // Add visitor code if provided for Kameleoon correlation
+  if (visitorCode) {
+    eventData.visitor_code = visitorCode;
+  }
+
+  window.dataLayer.push(eventData);
+
+};
+
+/**
  * Push product view event to GTM dataLayer when user views a product
  * @param {Object} product - The product being viewed
  * @param {string} product.id - Product ID
