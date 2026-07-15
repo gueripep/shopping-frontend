@@ -29,7 +29,6 @@ function AppContent() {
   const [showRegister, setShowRegister] = useState(false);
   const [loading, setLoading] = useState(true);
   const [visitorCode, setVisitorCode] = useState('');
-  const [kameleoonVariation, setKameleoonVariation] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -62,10 +61,6 @@ function AppContent() {
       const customData = new CustomData(4, variation.key);
       addData(code, customData);
       flush();
-
-      
-
-      setKameleoonVariation(variation);
 
     } catch (error) {
       console.warn('Kameleoon - Failed to initialize SDK (likely blocked or network error):', error);
